@@ -15,6 +15,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -109,17 +110,19 @@ export function SiteHeader() {
                 }
               />
               <DropdownMenuContent align="end" className="w-60">
-                <DropdownMenuLabel className="flex flex-col gap-1 py-1.5">
-                  <span className="truncate text-sm font-semibold text-ink">
-                    {user.name ?? "FixMate member"}
-                  </span>
-                  <span className="truncate text-xs font-normal text-muted-foreground">
-                    {user.email}
-                  </span>
-                  <Badge className="mt-1 w-fit rounded-full border-0 bg-signal/12 text-signal">
-                    {ROLE_LABEL[role]}
-                  </Badge>
-                </DropdownMenuLabel>
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel className="flex flex-col gap-1 py-1.5">
+                    <span className="truncate text-sm font-semibold text-ink">
+                      {user.name ?? "FixMate member"}
+                    </span>
+                    <span className="truncate text-xs font-normal text-muted-foreground">
+                      {user.email}
+                    </span>
+                    <Badge className="mt-1 w-fit rounded-full border-0 bg-signal/12 text-signal">
+                      {ROLE_LABEL[role]}
+                    </Badge>
+                  </DropdownMenuLabel>
+                </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem render={<Link href={dashboardPathFor(role)} />}>
                   <LayoutDashboard /> Dashboard
