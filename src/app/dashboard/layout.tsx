@@ -6,6 +6,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getCurrentUser } from "@/lib/auth-server";
 
 /**
+ * Session verification is a hard prerequisite for every route under here:
+ * nothing can render, and no role can be decided, before `getCurrentUser()`
+ * resolves. Next's dev-only instant-navigation validation treats every
+ * unconfigured segment as `instant = true`, and it resolves that per segment —
+ * an ancestor's opt-out does not reach below it — so every `/dashboard` layout
+ * and page that reads the session declares this for itself. Public routes keep
+ * validating. `instant` only controls the check: the shell still prerenders
+ * and streams.
+ */
+export const instant = false;
+
+/**
  * Real session check for every `/dashboard/*` route. `proxy.ts` only looks at
  * the cookie; this layout is where the session is actually verified.
  *

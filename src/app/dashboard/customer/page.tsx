@@ -14,6 +14,9 @@ import { getCurrentUser } from "@/lib/auth-server";
 import { serverFetch } from "@/lib/server-api";
 import type { Booking } from "@/lib/types";
 
+/** Session-gated: blocks until the user is verified — see `src/app/dashboard/layout.tsx`. */
+export const instant = false;
+
 export const metadata: Metadata = {
   title: "Customer dashboard",
   description: "Your repair requests, live job status and payment history at a glance.",

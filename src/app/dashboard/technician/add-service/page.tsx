@@ -6,6 +6,9 @@ import { DashboardHeading } from "@/components/dashboard/dashboard-heading";
 import { ServiceForm } from "@/components/technician/service-form";
 import { getCurrentUser } from "@/lib/auth-server";
 
+/** Session-gated: blocks until the user is verified — see `src/app/dashboard/layout.tsx`. */
+export const instant = false;
+
 export const metadata: Metadata = {
   title: "Add a service",
   description:

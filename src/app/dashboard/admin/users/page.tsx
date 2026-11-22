@@ -4,6 +4,9 @@ import { AdminUsersTable } from "@/components/admin/users-table";
 import { DashboardHeading } from "@/components/dashboard/dashboard-heading";
 import { getCurrentUser } from "@/lib/auth-server";
 
+/** Session-gated: blocks until the user is verified — see `src/app/dashboard/layout.tsx`. */
+export const instant = false;
+
 export const metadata: Metadata = {
   title: "Users",
   description: "Every FixMate account, with a one-click role change between customer, technician and admin.",

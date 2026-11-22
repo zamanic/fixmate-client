@@ -1,18 +1,27 @@
 import { headers } from "next/headers";
+import { connection } from "next/server";
 import { auth } from "@/lib/auth";
 
 /**
  * Server-side auth helpers for server components, route handlers and layouts.
  * The browser equivalent lives in `auth-client.ts`.
+ *
+ * Every helper below starts with `await connection()`: Better Auth compares
+ * `session.expiresAt` against the clock (`new Date()`) and jose stamps JWTs
+ * with `Date.now()`. Under Cache Components those clock reads are rejected
+ * during the prerender pass, so the session is explicitly deferred to request
+ * time — the same intent as reading `headers()`, made visible to the compiler.
  */
 
 /** The active session, or null. */
 export async function getServerSession() {
+  await connection();
   return auth.api.getSession({ headers: await headers() });
 }
 
 /** A fresh JWT for the Express API, or null when signed out. */
 export async function getServerJwtToken(): Promise<string | null> {
+  await connection();
   const result = await auth.api.getToken({ headers: await headers() });
   return result?.token ?? null;
 }

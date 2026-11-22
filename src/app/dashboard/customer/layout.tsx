@@ -2,6 +2,9 @@ import { redirect } from "next/navigation";
 
 import { getCurrentUser } from "@/lib/auth-server";
 
+/** Session-gated: blocks until the user is verified — see `src/app/dashboard/layout.tsx`. */
+export const instant = false;
+
 /** Cross-role access goes to `/unauthorized`, never `/sign-in`. */
 export default async function CustomerLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
