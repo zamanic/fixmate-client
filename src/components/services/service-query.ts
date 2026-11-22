@@ -84,6 +84,33 @@ export function servicesHref(query: ServiceQuery, page: number): string {
   return qs ? `/services?${qs}` : "/services";
 }
 
+/**
+ * How the Explore grid hands its filter context to a details page: the details
+ * URL carries a `from` param holding the exact `/services?...` link to come
+ * back to, so "Back to explore" reopens the same category, search and page.
+ */
+export const SERVICE_FROM_PARAM = "from";
+
+/** `/services/<id>` with the current filter context attached as `?from=…`. */
+export function serviceDetailHref(id: string, query: ServiceQuery): string {
+  const path = `/services/${encodeURIComponent(id)}`;
+  const from = servicesHref(query, query.page);
+  if (from === "/services") return path;
+  return `${path}?${SERVICE_FROM_PARAM}=${encodeURIComponent(from)}`;
+}
+
+/**
+ * Read the `from` param back. Only a bare `/services` path (plus a query
+ * string) is accepted, so a tampered URL can never redirect off-site.
+ */
+export function parseServiceFrom(raw: string | string[] | undefined): string | null {
+  const value = Array.isArray(raw) ? raw[0] : raw;
+  if (!value) return null;
+  const [path, search] = value.split("?");
+  if (path !== "/services") return null;
+  return search ? `/services?${search}` : "/services";
+}
+
 /** The public API path for the current filter set. */
 export function serviceApiPath(query: ServiceQuery): string {
   const params = filterParams(query);

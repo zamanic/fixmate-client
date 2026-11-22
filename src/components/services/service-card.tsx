@@ -11,14 +11,18 @@ import { CATEGORY_TINT, formatMoney, type Service } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 import { ServiceImage } from "./service-image";
-import { readRating } from "./service-query";
+import { readRating, serviceDetailHref, type ServiceQuery } from "./service-query";
 
 /**
  * The single service tile used across Explore Services (and reusable on the
  * landing page). Equal height by default so grid rows stay level.
+ *
+ * When the Explore page passes its `query`, both links carry the visitor's
+ * filter context into the details page so "Back to explore" lands on the same
+ * filtered list they were browsing.
  */
-export function ServiceCard({ service }: { service: Service }) {
-  const href = `/services/${service._id}`;
+export function ServiceCard({ service, query }: { service: Service; query?: ServiceQuery }) {
+  const href = query ? serviceDetailHref(service._id, query) : `/services/${service._id}`;
   const { average, count } = readRating(service);
   const tint = CATEGORY_TINT[service.category];
 

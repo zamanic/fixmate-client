@@ -16,7 +16,12 @@ import { EmptyState } from "@/components/empty-state";
 import { normalizeService } from "@/components/services/normalize";
 import { RequestRepairButton } from "@/components/services/request-repair-button";
 import { ServiceImage } from "@/components/services/service-image";
-import { readRating } from "@/components/services/service-query";
+import {
+  parseServiceFrom,
+  readRating,
+  SERVICE_FROM_PARAM,
+  type RawSearchParams,
+} from "@/components/services/service-query";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -27,6 +32,7 @@ import { cn } from "@/lib/utils";
 
 interface ServiceDetailPageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<RawSearchParams>;
 }
 
 type ServiceResult =
@@ -65,17 +71,17 @@ export async function generateMetadata({
   };
 }
 
-export default function ServiceDetailPage({ params }: ServiceDetailPageProps) {
+export default function ServiceDetailPage({ params, searchParams }: ServiceDetailPageProps) {
   return (
     <div className="fm-shell fm-section">
       <Suspense fallback={<DetailSkeleton />}>
-        <ServiceDetail params={params} />
+        <ServiceDetail params={params} searchParams={searchParams} />
       </Suspense>
     </div>
   );
 }
 
-async function ServiceDetail({ params }: ServiceDetailPageProps) {
+async function ServiceDetail({ params, searchParams }: ServiceDetailPageProps) {
   const { id } = await params;
   const result = await loadService(id);
 
@@ -97,10 +103,20 @@ async function ServiceDetail({ params }: ServiceDetailPageProps) {
   const { average, count } = readRating(service);
   const tint = CATEGORY_TINT[service.category];
 
+  // The Explore grid hands the filter it was browsing over as `?from=…`, so the
+  // back link (and the sign-in round-trip) returns to that exact category view.
+  const raw = await searchParams;
+  const from = parseServiceFrom(raw[SERVICE_FROM_PARAM]);
+  const returnHref = from ?? "/services";
+  const detailPath = `/services/${encodeURIComponent(service._id)}`;
+  const redirectTo = from
+    ? `${detailPath}?${SERVICE_FROM_PARAM}=${encodeURIComponent(from)}`
+    : detailPath;
+
   return (
     <>
       <Link
-        href="/services"
+        href={returnHref}
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-signal"
       >
         <ArrowLeft className="size-4" aria-hidden /> Back to explore
@@ -212,7 +228,13 @@ async function ServiceDetail({ params }: ServiceDetailPageProps) {
             </div>
 
             <div className="mt-5">
-              <RequestRepairButton serviceId={service._id} role={user?.role ?? null} />
+              <RequestRepairButton
+                serviceId={service._id}
+                role={user?.role ?? null}
+                customerName={user?.name ?? ""}
+                customerEmail={user?.email ?? ""}
+                redirectTo={redirectTo}
+              />
             </div>
           </div>
         </aside>

@@ -91,7 +91,7 @@ async function ServicesExplorer({ searchParams }: ServicesPageProps) {
           />
         ) : (
           <>
-            <ServicesGrid items={items} />
+            <ServicesGrid items={items} query={query} />
             <ServicePagination
               page={data.page}
               pages={data.pages}

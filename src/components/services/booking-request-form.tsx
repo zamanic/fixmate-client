@@ -19,23 +19,42 @@ import { ApiError, apiPost } from "@/lib/api";
  * available, you cannot request your own service, and one active request per
  * service is enforced with a 409 `ACTIVE_REQUEST_EXISTS`. The client mirrors
  * the date rule inline so a past date never costs a round-trip.
+ *
+ * Name and email are the signed-in account's — shown read-only so the customer
+ * can see exactly who the request is filed under, and never editable. The
+ * server reads them from the verified token regardless.
  */
 const MIN_DESCRIPTION = 20;
 const MAX_DESCRIPTION = 600;
 const MIN_PHONE = 6;
 const MIN_ADDRESS = 6;
 
+/** The fields the API returns for the stored booking (CONTRACT §6). */
 interface CreateBookingResponse {
   message?: string;
-  booking?: { id: string };
+  booking?: { id: string; technicianName?: string };
 }
+
+/** What the confirmation step needs to describe the ticket. */
+export interface TicketReceipt {
+  ticketId: string;
+  technicianName: string;
+}
+
+/** Read-only fields share one muted treatment so they read as "not yours to edit". */
+const READ_ONLY_FIELD =
+  "cursor-not-allowed bg-muted text-muted-foreground focus-visible:border-input focus-visible:ring-0";
 
 export function BookingRequestForm({
   serviceId,
+  customerName,
+  customerEmail,
   onSuccess,
 }: {
   serviceId: string;
-  onSuccess?: () => void;
+  customerName: string;
+  customerEmail: string;
+  onSuccess?: (receipt: TicketReceipt) => void;
 }) {
   const router = useRouter();
   const [phone, setPhone] = useState("");
@@ -80,9 +99,21 @@ export function BookingRequestForm({
         },
         true
       );
-      toast.success(result?.message ?? "Request sent to the technician.");
-      onSuccess?.();
-      router.refresh();
+      const booking = result?.booking;
+      if (!booking?.id) {
+        // The contract guarantees an id on 201 — if it ever goes missing, send
+        // the customer to their bookings rather than invent a ticket number.
+        toast.success(result?.message ?? "Request sent to the technician.");
+        router.push("/dashboard/customer/bookings");
+        return;
+      }
+      onSuccess?.({
+        ticketId: booking.id,
+        technicianName: booking.technicianName || "the technician",
+      });
+      // Deliberately no `router.refresh()` here: this page renders no booking
+      // data, and refreshing would re-suspend the page's <Suspense> boundary
+      // and unmount the confirmation dialog we just opened.
     } catch (error) {
       const message =
         error instanceof ApiError ? error.message : "We couldn't send that request. Please try again.";
@@ -103,6 +134,35 @@ export function BookingRequestForm({
 
   return (
     <form onSubmit={onSubmit} noValidate className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-2">
+          <Label htmlFor="booking-name">Name</Label>
+          <Input
+            id="booking-name"
+            value={customerName}
+            readOnly
+            tabIndex={-1}
+            aria-readonly="true"
+            className={READ_ONLY_FIELD}
+          />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="booking-email">Email</Label>
+          <Input
+            id="booking-email"
+            type="email"
+            value={customerEmail}
+            readOnly
+            tabIndex={-1}
+            aria-readonly="true"
+            className={READ_ONLY_FIELD}
+          />
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Taken from your FixMate account, so requests always come from you.
+      </p>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="grid gap-2">
           <Label htmlFor="booking-phone">Contact phone</Label>
