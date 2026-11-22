@@ -8,11 +8,12 @@ import { normalizeBookings } from "@/components/bookings/normalize";
 import { BookingsGridSkeleton } from "@/components/bookings/skeletons";
 import { TechnicianOverview } from "@/components/bookings/technician-overview";
 import { DashboardHeading } from "@/components/dashboard/dashboard-heading";
+import { normalizeServices } from "@/components/services/normalize";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCurrentUser } from "@/lib/auth-server";
 import { serverFetch } from "@/lib/server-api";
-import type { Booking } from "@/lib/types";
+import type { Booking, Service } from "@/lib/types";
 
 /** Session-gated: blocks until the user is verified — see `src/app/dashboard/layout.tsx`. */
 export const instant = false;
@@ -48,10 +49,16 @@ export default async function TechnicianOverviewPage() {
 }
 
 async function TechnicianOverviewData() {
-  const data = await serverFetch<{ items: Booking[] }>("/api/bookings/technician", {
-    auth: true,
-  });
-  return <TechnicianOverview bookings={normalizeBookings(data?.items ?? [])} />;
+  const [bookingsData, servicesData] = await Promise.all([
+    serverFetch<{ items: Booking[] }>("/api/bookings/technician", { auth: true }),
+    serverFetch<{ items: Service[] }>("/api/services/mine", { auth: true }),
+  ]);
+  return (
+    <TechnicianOverview
+      bookings={normalizeBookings(bookingsData?.items ?? [])}
+      services={normalizeServices(servicesData?.items ?? [])}
+    />
+  );
 }
 
 function TechnicianOverviewSkeleton() {

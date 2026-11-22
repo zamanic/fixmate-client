@@ -9,7 +9,6 @@ import {
   Inbox,
   Plus,
   Store,
-  Wrench,
   type LucideIcon,
 } from "lucide-react";
 
@@ -17,17 +16,21 @@ import { EmptyState } from "@/components/empty-state";
 import { BookingStatusDonut, CategoryBars, categorySlices, statusSlices } from "@/components/charts/overview-charts";
 import { buttonVariants } from "@/components/ui/button";
 import { staggerParent } from "@/lib/motion/variants";
-import { formatMoney, type Booking } from "@/lib/types";
+import { formatMoney, type Booking, type Service } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 import { BookingActions } from "./booking-actions";
 import { BookingCard } from "./booking-card";
 import { StatCard } from "./stat-card";
 
-const ACTIVE_STATUSES: Booking["status"][] = ["accepted", "in-progress"];
-
-/** Technician overview: pipeline totals, the newest requests, and quick links. */
-export function TechnicianOverview({ bookings }: { bookings: Booking[] }) {
+/** Technician overview: listing + request totals, the newest requests, and quick links. */
+export function TechnicianOverview({
+  bookings,
+  services,
+}: {
+  bookings: Booking[];
+  services: Service[];
+}) {
   const [items, setItems] = useState(bookings);
   const [seed, setSeed] = useState(bookings);
 
@@ -40,9 +43,10 @@ export function TechnicianOverview({ bookings }: { bookings: Booking[] }) {
     setItems((prev) => prev.map((item) => (item._id === updated._id ? updated : item)));
   }, []);
 
-  const newRequests = items.filter((item) => item.status === "requested").length;
-  const active = items.filter((item) => ACTIVE_STATUSES.includes(item.status)).length;
-  const completed = items.filter((item) => item.status === "completed").length;
+  const totalServices = services.length;
+  const approvedServices = services.filter((item) => item.approvalStatus === "approved").length;
+  const pendingReview = services.filter((item) => item.approvalStatus === "pending").length;
+  const pendingRequests = items.filter((item) => item.status === "requested").length;
   const earnings = items
     .filter((item) => item.status === "completed" && item.paymentStatus === "paid")
     .reduce((sum, item) => sum + (item.finalAmount ?? 0), 0);
@@ -76,29 +80,33 @@ export function TechnicianOverview({ bookings }: { bookings: Booking[] }) {
         className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
       >
         <StatCard
-          icon={Inbox}
-          label="New requests"
-          value={String(newRequests)}
-          hint="Waiting for your decision"
-          tone="bg-status-requested/12 text-status-requested"
+          href="/dashboard/technician/my-services"
+          icon={Store}
+          label="Total services"
+          value={String(totalServices)}
+          hint="Listings you offer"
+          tone="bg-teal/10 text-teal"
         />
         <StatCard
-          icon={Wrench}
-          label="Active jobs"
-          value={String(active)}
-          hint="Accepted or underway"
-          tone="bg-status-inprogress/12 text-status-inprogress"
-        />
-        <StatCard
+          href="/dashboard/technician/my-services"
           icon={CircleCheck}
-          label="Completed"
-          value={String(completed)}
-          hint="Jobs you've finished"
+          label="Approved services"
+          value={String(approvedServices)}
+          hint={`${pendingReview} waiting for review`}
           tone="bg-status-completed/12 text-status-completed"
         />
         <StatCard
+          href="/dashboard/technician/requests"
+          icon={Inbox}
+          label="Pending requests"
+          value={String(pendingRequests)}
+          hint="Waiting for you to accept or decline"
+          tone="bg-status-requested/12 text-status-requested"
+        />
+        <StatCard
+          href="/dashboard/technician/requests"
           icon={Banknote}
-          label="Earnings"
+          label="Total earnings"
           value={formatMoney(earnings)}
           hint="From completed, paid jobs"
           tone="bg-status-paid/12 text-status-paid"
