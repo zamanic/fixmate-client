@@ -57,6 +57,14 @@
   --color-tint-washing: var(--tint-washing);
   --color-tint-electrical: var(--tint-electrical);
 
+  /* scroll-film acts -> bg-film-ground / text-film-eyebrow / film act accents */
+  --color-film-ground: var(--film-ground);
+  --color-film-eyebrow: var(--film-eyebrow);
+  --color-film-act-request: var(--film-act-request);
+  --color-film-act-diagnose: var(--film-act-diagnose);
+  --color-film-act-repair: var(--film-act-repair);
+  --color-film-act-handover: var(--film-act-handover);
+
   /* status palette -> text-status-requested / bg-status-completed ... */
   --color-status-requested: var(--status-requested);
   --color-status-accepted: var(--status-accepted);
@@ -101,6 +109,16 @@
   --status-cancelled: #64748b;
   --status-paid: #16a34a;
   --status-unpaid: #64748b;
+
+  /* --- scroll-film palette (the four-act repair film hero) --- */
+  --film-ground: #07121c;
+  --film-ink: #eaf3f2;
+  --film-ink-soft: #93b0b3;
+  --film-eyebrow: #5eead4;
+  --film-act-request: #2dd4bf;
+  --film-act-diagnose: #38bdf8;
+  --film-act-repair: #ef6c2f;
+  --film-act-handover: #22c55e;
 
   /* --- shadcn semantic layer --- */
   --background: var(--bench);
@@ -156,6 +174,11 @@
   --tint-tv: #331f1f;
   --tint-washing: #1c2c1a;
   --tint-electrical: #352915;
+
+  /* the film sinks a touch darker at night; the act accents stay put */
+  --film-ground: #04121c;
+  --film-ink: #f1f8f7;
+  --film-ink-soft: #8fb3b6;
 
   --background: var(--bench);
   --foreground: var(--ink);
@@ -268,20 +291,14 @@
   position: relative;
   z-index: 0;
 
-  /* FixMate theme for the four-act repair film. */
-  --sw-bg: #07121c;
-  --sw-ink: #eaf3f2;
-  --sw-ink-soft: #93b0b3;
-  --sw-accent: #2dd4bf;
+  /* FixMate theme for the four-act repair film — sourced from the same
+     `--film-*` tokens the React hero uses, so both stay in lockstep. */
+  --sw-bg: var(--film-ground);
+  --sw-ink: var(--film-ink);
+  --sw-ink-soft: var(--film-ink-soft);
+  --sw-accent: var(--film-act-request);
   --sw-font-display: var(--font-display);
   --sw-font-body: var(--font-body);
-}
-
-.dark .fm-film {
-  --sw-bg: #04121c;
-  --sw-ink: #f1f8f7;
-  --sw-ink-soft: #8fb3b6;
-  --sw-accent: #2dd4bf;
 }
 
 /* The engine injects `html,body{overflow-x:hidden}`. `hidden` turns the root

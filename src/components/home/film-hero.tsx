@@ -45,7 +45,7 @@ const SCENES: FilmScene[] = [
     label: "Send a request",
     still: "/film/intake.png",
     clip: "/film/dive-intake.mp4",
-    accent: "#2dd4bf",
+    accent: "var(--film-act-request)",
     eyebrow: "Step 01 — Tell us what's broken",
     title: "Broken device? Start here.",
     body: "Describe the fault, pick a slot and send one request to a certified technician nearby. No phone tag, no guesswork.",
@@ -57,7 +57,7 @@ const SCENES: FilmScene[] = [
     label: "Verified diagnosis",
     still: "/film/diagnostics.png",
     clip: "/film/dive-diagnostics.mp4",
-    accent: "#38bdf8",
+    accent: "var(--film-act-diagnose)",
     eyebrow: "Step 02 — A technician you can trust",
     title: "Vetted hands, honest quote.",
     body: "Every FixMate technician is reviewed by our team before their first job. They confirm the fault and quote a fixed price up front.",
@@ -69,7 +69,7 @@ const SCENES: FilmScene[] = [
     label: "The repair",
     still: "/film/repair.png",
     clip: "/film/dive-repair.mp4",
-    accent: "#ef6c2f",
+    accent: "var(--film-act-repair)",
     eyebrow: "Step 03 — Real work, tracked live",
     title: "Follow it to the last screw.",
     body: "From accepted to in progress to done, every status change is logged — so you always know exactly what is happening to your device.",
@@ -81,7 +81,7 @@ const SCENES: FilmScene[] = [
     label: "Pay & review",
     still: "/film/handover.png",
     clip: "/film/dive-handover.mp4",
-    accent: "#22c55e",
+    accent: "var(--film-act-handover)",
     eyebrow: "Step 04 — Pay only after it works",
     title: "You pay once it's fixed.",
     body: "Approve the finished repair, pay securely through Stripe, then leave a review. A FixMate job is never paid for before the work is done.",
@@ -140,7 +140,7 @@ export function FilmHero() {
   }, []);
 
   return (
-    <section className="relative min-h-dvh bg-[#07121c]">
+    <section className="relative min-h-dvh bg-film-ground">
       {!live && <StaticFilmHero />}
       {/*
         The engine appends its own fixed chrome here. `.fm-film` (globals.css)
@@ -163,10 +163,10 @@ function StaticFilmHero() {
       />
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-r from-[#07121c] via-[#07121c]/85 to-[#07121c]/35"
+        className="absolute inset-0 bg-gradient-to-r from-film-ground via-film-ground/85 to-film-ground/35"
       />
       <div className="fm-shell relative flex min-h-dvh flex-col justify-center py-24">
-        <p className="flex items-center gap-2 text-xs font-semibold tracking-[0.18em] text-[#5eead4] uppercase">
+        <p className="flex items-center gap-2 text-xs font-semibold tracking-[0.18em] text-film-eyebrow uppercase">
           <Sparkles className="size-3.5" aria-hidden />
           Verified technicians · Pay after service
         </p>
