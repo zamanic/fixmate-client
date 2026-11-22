@@ -1,3 +1,4 @@
+import { serviceImageFor } from "@/lib/service-images";
 import type { Service } from "@/lib/types";
 
 /**
@@ -11,7 +12,11 @@ import type { Service } from "@/lib/types";
  */
 
 export function normalizeService(raw: Service & { id?: string }): Service {
-  return { ...raw, _id: raw._id || raw.id || "" };
+  return {
+    ...raw,
+    _id: raw._id || raw.id || "",
+    image: serviceImageFor(raw.title, raw.image),
+  };
 }
 
 export function normalizeServices(items: Service[]): Service[] {
