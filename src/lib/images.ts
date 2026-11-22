@@ -1,10 +1,13 @@
 /**
  * Single source of truth for every photograph in the product.
  *
- * All imagery is generated from a prompt so the art direction stays in step:
+ * Most imagery is generated from a prompt so the art direction stays in step:
  * clean workbenches, real tools, natural light, no stock-photo cheese. Callers
  * pass a *scene* description, never a raw URL — that keeps prompts consistent
- * and makes swapping the provider a one-file change.
+ * and makes swapping the provider a one-file change. The landing-page category
+ * tiles and the closing CTA backdrop are the exception: they are committed
+ * files under `public/images/`, because the prompt endpoint serves a generic
+ * placeholder instead of a render.
  */
 
 export type ImageSize =
@@ -58,45 +61,23 @@ export const FILM_SCENES = [
   },
 ] as const;
 
-/** Category tiles — one canonical prompt per repair category. */
-export const CATEGORY_IMAGE: Record<string, string> = {
-  Smartphone: img(
-    "Flat lay of a disassembled smartphone with its screen, battery and logic board arranged neatly on a pale grey mat, soft studio light, clean and organised, no text",
-    "landscape_4_3"
-  ),
-  "Laptop & PC": img(
-    "Open laptop with its keyboard lifted to reveal the cooling fans and motherboard, on a clean repair bench, cool daylight, precise and technical, no text",
-    "landscape_4_3"
-  ),
-  AC: img(
-    "A split air conditioner indoor unit with its front panel open and a clean filter being inspected, bright white wall, soft daylight, tidy professional service scene, no text",
-    "landscape_4_3"
-  ),
-  Refrigerator: img(
-    "Open refrigerator with its shelves pulled out and a technician's multimeter resting on the door, bright modern kitchen, clean daylight, no text",
-    "landscape_4_3"
-  ),
-  TV: img(
-    "Large flat screen television on a low stand with the back panel removed showing cables and boards, minimal living room, soft daylight, no text",
-    "landscape_4_3"
-  ),
-  "Washing Machine": img(
-    "Front loading washing machine with its door open and a technician's gloved hand checking the drum seal, bright utility room, clean daylight, no text",
-    "landscape_4_3"
-  ),
-  Electrical: img(
-    "Neat open electrical distribution board with labelled circuit breakers and a voltage tester held against a wire, clean utility wall, soft daylight, no text",
-    "landscape_4_3"
-  ),
+/**
+ * Home-page category tiles.
+ *
+ * These are committed local assets rather than prompt URLs: the remote
+ * text-to-image endpoint the rest of this file points at only ever served a
+ * generic "image is generating" placeholder, which left all seven tiles broken
+ * on the landing page. Keep the filenames in step with `public/images/categories/`.
+ */
+export const CATEGORY_TILE_IMAGE: Record<string, string> = {
+  Smartphone: "/images/categories/smartphone.jpg",
+  "Laptop & PC": "/images/categories/laptop-pc.jpg",
+  AC: "/images/categories/ac.jpg",
+  Refrigerator: "/images/categories/refrigerator.jpg",
+  TV: "/images/categories/tv.jpg",
+  "Washing Machine": "/images/categories/washing-machine.jpg",
+  Electrical: "/images/categories/electrical.jpg",
 };
-
-/** Home-page category tiles use a portrait crop so the grid reads as a gallery. */
-export const CATEGORY_TILE_IMAGE: Record<string, string> = Object.fromEntries(
-  Object.entries(CATEGORY_IMAGE).map(([key, value]) => [
-    key,
-    value.replace("image_size=landscape_4_3", "image_size=portrait_4_3"),
-  ])
-);
 
 /** Supporting photography. */
 export const ABOUT_IMAGE = img(
