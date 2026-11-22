@@ -259,13 +259,15 @@ export function ClosingCta() {
   return (
     <section className="pb-20">
       <div className="fm-shell">
-        <Reveal className="relative overflow-hidden rounded-3xl bg-ink px-7 py-14 text-white sm:px-12">
+        <Reveal className="relative overflow-hidden rounded-3xl bg-cta px-7 py-14 text-cta-ink sm:px-12">
           {/*
-            Backdrop is a committed dark workshop photograph, kept low-opacity
-            over `bg-ink` and capped with a two-stop gradient (dark at the left
-            where the copy sits, lifting slightly to the right) plus a dark foot
-            so the white headline, body copy and outline button stay legible at
-            every viewport width.
+            The card sits on the theme-stable `--cta-surface` (rich dark teal),
+            never on a polarity-flipping token like `--ink` — which turns
+            near-white in dark mode and washed the copy out. On top of it: the
+            dark workshop photograph at low opacity, a two-stop gradient (dark
+            at the left where the copy sits, lifting slightly to the right) and
+            a dark foot, so the white headline, slate-200 body copy and the
+            outline button stay crisp in both themes.
           */}
           <div
             aria-hidden
@@ -274,20 +276,20 @@ export function ClosingCta() {
           />
           <div
             aria-hidden
-            className="absolute inset-0 bg-gradient-to-r from-ink via-ink/90 to-ink/55"
+            className="absolute inset-0 bg-gradient-to-r from-cta via-cta/90 to-cta/55"
           />
           <div
             aria-hidden
-            className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-ink/80 to-transparent"
+            className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-cta/80 to-transparent"
           />
           <div className="relative max-w-xl">
             <p className="text-xs font-semibold tracking-[0.18em] text-signal uppercase">
               Ready when you are
             </p>
-            <h2 className="fm-h2 mt-3 font-bold text-white">
+            <h2 className="fm-h2 mt-3 font-bold text-cta-ink">
               Your repair, handled end to end.
             </h2>
-            <p className="fm-body mt-4 text-white/75">
+            <p className="fm-body mt-4 text-cta-ink-soft">
               Request a technician in under a minute, follow the job live, and pay only after the
               fix is done.
             </p>
@@ -303,13 +305,13 @@ export function ClosingCta() {
                 href="/sign-up"
                 className={cn(
                   buttonVariants({ variant: "outline", size: "lg" }),
-                  "border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white"
+                  "border-white/30 bg-transparent text-white hover:border-white/60 hover:bg-white/10 hover:text-white"
                 )}
               >
                 Create a free account
               </Link>
             </div>
-            <p className="mt-5 text-sm text-white/60">
+            <p className="mt-5 text-sm text-cta-ink-soft">
               Fixing devices for a living?{" "}
               <Link href="/sign-up?role=technician" className="font-medium text-signal hover:underline">
                 Join as a technician

@@ -48,10 +48,13 @@
   --color-wire: var(--wire);
   --color-brand-indigo: var(--accent-indigo);
 
-  /* theme-stable light-on-dark surface -> bg-nav / text-nav-label ... */
+  /* theme-stable light-on-dark surfaces -> bg-nav / bg-cta / text-cta-ink ... */
   --color-nav: var(--nav-surface);
   --color-nav-label: var(--nav-label);
   --color-nav-label-active: var(--nav-label-active);
+  --color-cta: var(--cta-surface);
+  --color-cta-ink: var(--cta-ink);
+  --color-cta-ink-soft: var(--cta-ink-soft);
 
   /* category tints -> bg-tint-smartphone ... */
   --color-tint-smartphone: var(--tint-smartphone);
@@ -98,16 +101,19 @@
   --wire: #e2ebe9;
   --accent-indigo: #4f46e5;
 
-  /* --- theme-stable light-on-dark surface --------------------------------
-     The sticky navbar is deliberately dark in *both* themes. It carries white
-     / slate-200 copy, and a surface that flipped with the toggle (like `--ink`,
-     which is near-white in dark mode) washed that copy out. Because these vars
-     are only declared here — never in `.dark` — they stay put when the theme
-     changes. */
+  /* --- theme-stable light-on-dark surfaces -------------------------------
+     The sticky navbar and the closing CTA are deliberately dark in *both*
+     themes. They carry white / slate-200 copy, and a surface that flipped with
+     the toggle (like `--ink`, which is near-white in dark mode) washed that
+     copy out. Because these vars are only declared here — never in `.dark` —
+     they stay put when the theme changes. */
   --nav-surface: #0c2f35;
   --nav-hairline: rgba(255, 255, 255, 0.14);
   --nav-label: #e2e8f0;
   --nav-label-active: #ffffff;
+  --cta-surface: #0b2c32;
+  --cta-ink: #ffffff;
+  --cta-ink-soft: #e2e8f0;
 
   --tint-smartphone: #e7f4f1;
   --tint-laptop: #f5efdc;
