@@ -48,6 +48,11 @@
   --color-wire: var(--wire);
   --color-brand-indigo: var(--accent-indigo);
 
+  /* theme-stable light-on-dark surface -> bg-nav / text-nav-label ... */
+  --color-nav: var(--nav-surface);
+  --color-nav-label: var(--nav-label);
+  --color-nav-label-active: var(--nav-label-active);
+
   /* category tints -> bg-tint-smartphone ... */
   --color-tint-smartphone: var(--tint-smartphone);
   --color-tint-laptop: var(--tint-laptop);
@@ -92,6 +97,17 @@
   --signal: #ef6c2f;
   --wire: #e2ebe9;
   --accent-indigo: #4f46e5;
+
+  /* --- theme-stable light-on-dark surface --------------------------------
+     The sticky navbar is deliberately dark in *both* themes. It carries white
+     / slate-200 copy, and a surface that flipped with the toggle (like `--ink`,
+     which is near-white in dark mode) washed that copy out. Because these vars
+     are only declared here — never in `.dark` — they stay put when the theme
+     changes. */
+  --nav-surface: #0c2f35;
+  --nav-hairline: rgba(255, 255, 255, 0.14);
+  --nav-label: #e2e8f0;
+  --nav-label-active: #ffffff;
 
   --tint-smartphone: #e7f4f1;
   --tint-laptop: #f5efdc;
@@ -275,22 +291,24 @@
   }
 }
 
-/* Glassy sticky nav: translucent enough to reveal the film/page underneath,
-   blurred enough to keep labels readable over both dark and light sections. */
+/* Glassy sticky nav. The tint rides the theme-stable `--nav-surface` (dark
+   teal) rather than `--background`, so the white / slate-200 labels keep their
+   contrast whether the theme toggle is on or off — and whatever light or dark
+   section scrolls beneath the header. Blurred just enough to stay glassy. */
 .fm-glass-header {
-  background: color-mix(in oklab, var(--background) 34%, transparent);
-  border-bottom-color: color-mix(in oklab, var(--foreground) 12%, transparent);
-  box-shadow: 0 1px 0 color-mix(in oklab, var(--foreground) 5%, transparent);
+  background: color-mix(in oklab, var(--nav-surface) 86%, transparent);
+  border-bottom-color: var(--nav-hairline);
+  box-shadow: 0 1px 0 color-mix(in oklab, #000 22%, transparent);
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 .dark .fm-glass-header {
-  background: color-mix(in oklab, var(--background) 28%, transparent);
+  background: color-mix(in oklab, var(--nav-surface) 90%, transparent);
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .fm-glass-header,
   .dark .fm-glass-header {
-    background: color-mix(in oklab, var(--background) 88%, transparent);
+    background: var(--nav-surface);
   }
 }
 

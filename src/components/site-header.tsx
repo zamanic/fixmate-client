@@ -56,7 +56,7 @@ export function SiteHeader() {
 
   return (
     <header
-      className="fm-glass-header sticky top-0 z-40 border-b"
+      className="fm-glass-header sticky top-0 z-40 border-b text-nav-label"
       style={{
         // LightningCSS collapses this to the WebKit prefix in the emitted CSS.
         // Keep the standard property inline so unprefixed browsers still blur.
@@ -71,7 +71,7 @@ export function SiteHeader() {
         is hidden and the two-track grid keeps logo left / actions right.
       */}
       <div className="fm-shell grid h-16 grid-cols-[1fr_auto] items-center gap-4 lg:grid-cols-[1fr_auto_1fr]">
-        <Logo />
+        <Logo tone="light" />
 
         <nav aria-label="Main" className="hidden items-center justify-center gap-1 lg:flex">
           {PUBLIC_NAV.map((item) => {
@@ -82,8 +82,14 @@ export function SiteHeader() {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
+                  // Labels stay light-on-dark in *both* themes: the sticky nav
+                  // paints a theme-stable dark teal surface, so an inactive
+                  // link reads as crisp slate-200 and the active one as white,
+                  // with the hover state always stepping up to white.
                   "relative rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  active ? "text-ink" : "text-muted-foreground hover:text-ink"
+                  active
+                    ? "text-nav-label-active"
+                    : "text-nav-label hover:text-nav-label-active"
                 )}
               >
                 {item.label}
@@ -111,7 +117,7 @@ export function SiteHeader() {
                   <button
                     type="button"
                     aria-label="Account menu"
-                    className="flex items-center gap-1.5 rounded-full p-0.5 outline-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
+                    className="flex items-center gap-1.5 rounded-full p-0.5 outline-none transition-colors hover:bg-white/10 focus-visible:ring-3 focus-visible:ring-ring/50"
                   >
                     <Avatar>
                       {user.image ? <AvatarImage src={user.image} alt="" /> : null}
@@ -119,7 +125,7 @@ export function SiteHeader() {
                         {initials(user.name ?? "FixMate")}
                       </AvatarFallback>
                     </Avatar>
-                    <ChevronDown className="size-3.5 text-muted-foreground" />
+                    <ChevronDown className="size-3.5 text-nav-label" />
                   </button>
                 }
               />
