@@ -260,14 +260,25 @@ export function ClosingCta() {
     <section className="pb-20">
       <div className="fm-shell">
         <Reveal className="relative overflow-hidden rounded-3xl bg-ink px-7 py-14 text-white sm:px-12">
+          {/*
+            Backdrop is a committed dark workshop photograph, kept low-opacity
+            over `bg-ink` and capped with a two-stop gradient (dark at the left
+            where the copy sits, lifting slightly to the right) plus a dark foot
+            so the white headline, body copy and outline button stay legible at
+            every viewport width.
+          */}
           <div
             aria-hidden
-            className="absolute inset-0 bg-cover bg-center opacity-30"
+            className="absolute inset-0 bg-cover bg-center opacity-45"
             style={{ backgroundImage: `url(${CTA_IMAGE})` }}
           />
           <div
             aria-hidden
-            className="absolute inset-0 bg-gradient-to-r from-ink via-ink/85 to-ink/40"
+            className="absolute inset-0 bg-gradient-to-r from-ink via-ink/90 to-ink/55"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-ink/80 to-transparent"
           />
           <div className="relative max-w-xl">
             <p className="text-xs font-semibold tracking-[0.18em] text-signal uppercase">

@@ -85,7 +85,9 @@ export const ABOUT_IMAGE = img(
   "portrait_4_3"
 );
 
-export const CTA_IMAGE = img(
-  "Wide shot of a sunlit modern workshop bench with neatly hung tools, a laptop mid-repair and a kettle, warm inviting atmosphere, editorial interior photograph, no text",
-  "landscape_16_9"
-);
+/**
+ * Closing call-to-action backdrop. A deliberately dark, low-key workshop shot
+ * (committed locally) so the white headline, sub-copy and outline button keep
+ * strong contrast, and a dark overlay on top of it guarantees that at any crop.
+ */
+export const CTA_IMAGE = "/images/cta/workshop-dark.jpg";
