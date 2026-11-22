@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Wrench } from "lucide-react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -31,6 +33,9 @@ export function RequestRepairButton({
   serviceId: string;
   role: Role | null;
 }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+
   if (role === null) {
     return (
       <Link
@@ -56,7 +61,7 @@ export function RequestRepairButton({
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={<Button size="lg" className="h-11 w-full" />}>
         <Wrench /> Request Repair
       </DialogTrigger>
@@ -68,7 +73,13 @@ export function RequestRepairButton({
             availability and the final price before any work starts.
           </DialogDescription>
         </DialogHeader>
-        <BookingRequestForm serviceId={serviceId} />
+        <BookingRequestForm
+          serviceId={serviceId}
+          onSuccess={() => {
+            setOpen(false);
+            router.push("/dashboard/customer/bookings");
+          }}
+        />
       </DialogContent>
     </Dialog>
   );
