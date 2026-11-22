@@ -1,73 +1,70 @@
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Suspense } from "react";
+import { ArrowRight } from "lucide-react";
 
-const STATUSES = [
-  { label: "Requested", className: "bg-status-requested/12 text-status-requested" },
-  { label: "Accepted", className: "bg-status-accepted/12 text-status-accepted" },
-  { label: "In Progress", className: "bg-status-inprogress/12 text-status-inprogress" },
-  { label: "Completed", className: "bg-status-completed/12 text-status-completed" },
-  { label: "Rejected", className: "bg-status-rejected/12 text-status-rejected" },
-  { label: "Cancelled", className: "bg-status-cancelled/12 text-status-cancelled" },
-];
+import { FeaturedServices, FeaturedServicesSkeleton } from "@/components/home/featured-services";
+import { FilmHero } from "@/components/home/film-hero";
+import {
+  ClosingCta,
+  HowItWorks,
+  PopularCategories,
+  WhyChooseUs,
+} from "@/components/home/landing-sections";
+import { SectionHeading } from "@/components/home/reveal";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-const CATEGORIES = [
-  { label: "Smartphone", tint: "bg-tint-smartphone" },
-  { label: "Laptop & PC", tint: "bg-tint-laptop" },
-  { label: "AC", tint: "bg-tint-ac" },
-  { label: "Refrigerator", tint: "bg-tint-refrigerator" },
-  { label: "TV", tint: "bg-tint-tv" },
-  { label: "Washing Machine", tint: "bg-tint-washing" },
-  { label: "Electrical", tint: "bg-tint-electrical" },
-];
+export const metadata: Metadata = {
+  title: "Book a trusted technician, on demand",
+  description:
+    "FixMate connects you with verified technicians for smartphones, laptops, appliances and home electrical work. Send one request, track the job live, and pay only after it is fixed.",
+};
 
+/**
+ * Landing page.
+ *
+ * Order: the scroll-film hero (a self-contained lets-scroll experience that
+ * takes ~5.5 viewports) → featured listings fetched from the API → the static
+ * story sections. Everything below the hero is wrapped in an opaque, raised
+ * layer so it paints over the film's fixed backdrop once you scroll past it.
+ */
 export default function Home() {
   return (
-    <main className="fm-shell fm-section">
-      <p className="fm-eyebrow">Verified technicians · Pay after service</p>
-      <h1 className="fm-h1 mt-3 max-w-3xl font-bold text-ink">
-        Your device is broken. FixMate finds the hands.
-      </h1>
-      <p className="fm-body mt-4 max-w-2xl text-muted-foreground">
-        Design-system checkpoint — F0. Fonts, tokens, status palette and category
-        tints render here before any product surface is built on top of them.
-      </p>
+    <>
+      <FilmHero />
 
-      <div className="mt-8 flex flex-wrap gap-3">
-        <Button>Find a technician</Button>
-        <Button variant="outline">How it works</Button>
+      <div className="relative z-10 bg-background">
+        <section className="fm-section">
+          <div className="fm-shell">
+            <SectionHeading
+              eyebrow="Fresh this week"
+              title="Featured services"
+              description="The newest approved listings from FixMate technicians — real people, fixed prices, and a repair you can track from request to completion."
+              action={
+                <Link
+                  href="/services"
+                  className={cn(buttonVariants({ variant: "outline" }), "gap-2")}
+                >
+                  Browse all services
+                  <ArrowRight className="size-4" aria-hidden />
+                </Link>
+              }
+            />
+
+            <div className="mt-10">
+              <Suspense fallback={<FeaturedServicesSkeleton />}>
+                <FeaturedServices />
+              </Suspense>
+            </div>
+          </div>
+        </section>
+
+        <HowItWorks />
+        <PopularCategories />
+        <WhyChooseUs />
+        <ClosingCta />
       </div>
-
-      <section className="mt-12">
-        <h2 className="fm-h3 font-semibold">Job status palette</h2>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {STATUSES.map((s) => (
-            <Badge key={s.label} className={`rounded-full border-0 ${s.className}`}>
-              {s.label}
-            </Badge>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-12">
-        <h2 className="fm-h3 font-semibold">Category tints</h2>
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {CATEGORIES.map((c) => (
-            <Card key={c.label} className="fm-card-hover h-full">
-              <CardHeader>
-                <div className={`h-24 rounded-lg ${c.tint}`} aria-hidden />
-                <CardTitle className="pt-2">{c.label}</CardTitle>
-                <CardDescription>Line art for {c.label} repairs.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="ghost" className="px-0">
-                  Browse {c.label}
-                </Button>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-    </main>
+    </>
   );
 }

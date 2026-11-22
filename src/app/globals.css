@@ -252,6 +252,52 @@
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Scroll-film hero (lets-scroll engine, `public/vendor/lets-scroll/`)
+   The engine ships its defaults in `@layer sw` and declares its theme on
+   `.sw-root` — the host element it mounts into. Everything below is left
+   *unlayered* on purpose: unlayered declarations always beat layered ones, so
+   these win over both Tailwind's layers and the engine's own `sw` layer
+   regardless of injection order. See `.project/motion-plan.md` → F2.
+   --------------------------------------------------------------------------- */
+.fm-film {
+  /* Stacking context only — never `transform`/`contain`. The engine's fixed
+     chrome (z-index 10–60) has to stay *under* the `relative z-10` page
+     content that scrolls over the film, and a transform here would anchor its
+     `position: fixed` children to this box instead of the viewport. */
+  position: relative;
+  z-index: 0;
+
+  /* FixMate theme for the four-act repair film. */
+  --sw-bg: #07121c;
+  --sw-ink: #eaf3f2;
+  --sw-ink-soft: #93b0b3;
+  --sw-accent: #2dd4bf;
+  --sw-font-display: var(--font-display);
+  --sw-font-body: var(--font-body);
+}
+
+.dark .fm-film {
+  --sw-bg: #04121c;
+  --sw-ink: #f1f8f7;
+  --sw-ink-soft: #8fb3b6;
+  --sw-accent: #2dd4bf;
+}
+
+/* The engine injects `html,body{overflow-x:hidden}`. `hidden` turns the root
+   into a scroll container, which breaks the `sticky` site header; `clip`
+   suppresses the same overflow without creating one. */
+html,
+body {
+  overflow-x: clip;
+}
+
+/* …and it sets `background: var(--sw-bg)` on body, which would otherwise leak
+   the film's navy onto every other route. The film paints its own backdrop. */
+body {
+  background-color: var(--background);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
