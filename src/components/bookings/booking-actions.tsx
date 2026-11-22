@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Check, Play, X } from "lucide-react";
+import { Check, CreditCard, Play, X } from "lucide-react";
 
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { Spinner } from "@/components/spinner";
@@ -18,8 +18,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ApiError, apiPatch } from "@/lib/api";
-import type { Booking } from "@/lib/types";
+import { ApiError, apiPatch, apiPost } from "@/lib/api";
+import { formatMoney, type Booking } from "@/lib/types";
 
 import { normalizeBooking } from "./normalize";
 
@@ -58,6 +58,7 @@ export function BookingActions({
   const [confirming, setConfirming] = useState<"cancel" | "reject" | null>(null);
   const [completeOpen, setCompleteOpen] = useState(false);
   const [amount, setAmount] = useState(String(booking.finalAmount ?? ""));
+  const [paying, setPaying] = useState(false);
 
   const busy = pending !== null;
   const parsedAmount = Number(amount);
@@ -143,21 +144,48 @@ export function BookingActions({
     if (ok) setCompleteOpen(false);
   }
 
+  /**
+   * Starts a Stripe checkout for a completed, unpaid booking. The amount is read
+   * from the stored booking server-side, so only the booking id travels.
+   */
+  async function payNow() {
+    setPaying(true);
+    try {
+      const result = await apiPost<{ url?: string }>(
+        "/api/payments/create-checkout-session",
+        { bookingId: booking._id },
+        true
+      );
+      if (!result?.url) throw new ApiError("Stripe did not return a checkout link.", "SERVER_ERROR");
+      window.location.assign(result.url);
+    } catch (error) {
+      toast.error(
+        error instanceof ApiError ? error.message : "We couldn't start the payment. Please try again."
+      );
+      setPaying(false);
+    }
+  }
+
   /* ----------------------------- customer ----------------------------- */
   if (role === "customer") {
-    // TODO(f7): render the "Pay now" action here for completed + unpaid bookings.
-    if (booking.status !== "requested") return null;
+    const payable = booking.status === "completed" && booking.paymentStatus !== "paid";
 
     return (
       <>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={busy}
-          onClick={() => setConfirming("cancel")}
-        >
-          {pending === "cancel" ? <Spinner /> : <X />} Cancel request
-        </Button>
+        {payable ? (
+          <Button size="sm" disabled={paying} onClick={() => void payNow()}>
+            {paying ? <Spinner /> : <CreditCard />} Pay {formatMoney(booking.finalAmount)}
+          </Button>
+        ) : booking.status === "requested" ? (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={busy}
+            onClick={() => setConfirming("cancel")}
+          >
+            {pending === "cancel" ? <Spinner /> : <X />} Cancel request
+          </Button>
+        ) : null}
 
         <ConfirmDialog
           open={confirming === "cancel"}
