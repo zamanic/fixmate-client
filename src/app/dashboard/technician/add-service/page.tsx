@@ -39,7 +39,7 @@ const PHOTO_TIPS = [
   "Use your own clear, well-lit photo of the work you do.",
   "Show the service, not a stock image or a logo.",
   "Landscape works best — it fills the card without cropping.",
-  "Keep it under 5 MB, or paste a direct image link.",
+  "Upload a JPG or PNG up to 8 MB — or paste a direct image link.",
 ];
 
 export default async function AddServicePage() {
