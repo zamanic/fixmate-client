@@ -320,6 +320,18 @@
   --sw-font-body: var(--font-body);
 }
 
+/* The engine's route pill is a near-white chip with `var(--sw-ink)` text, which
+   FixMate maps to the film's near-white ink — so the label read white-on-white
+   over every act. It now rides the brand orange (the logo tile / primary
+   button) with dark ink text, which stays legible over both the dark film and
+   the light page sections the rail floats across. */
+.sw-route__label {
+  color: #0b1e22;
+  background: var(--signal);
+  border-color: color-mix(in oklab, #000 16%, transparent);
+  box-shadow: 0 8px 20px -10px color-mix(in oklab, var(--signal) 75%, transparent);
+}
+
 /* The engine injects `html,body{overflow-x:hidden}`. `hidden` turns the root
    into a scroll container, which breaks the `sticky` site header; `clip`
    suppresses the same overflow without creating one. */
