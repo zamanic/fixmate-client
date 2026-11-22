@@ -171,6 +171,22 @@ export const pressable = {
 } as const;
 
 /* ------------------------------------------------------------------ */
+/* Ambient decoration                                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Slow mirroring loop for decorative backdrops only — never on content.
+ * Transform/opacity only, so it stays on the compositor, and every caller
+ * skips it under `prefers-reduced-motion`.
+ */
+export const ambientDrift = {
+  duration: 26,
+  repeat: Infinity,
+  repeatType: "mirror",
+  ease: "easeInOut",
+} as const;
+
+/* ------------------------------------------------------------------ */
 /* Viewport defaults                                                   */
 /* ------------------------------------------------------------------ */
 

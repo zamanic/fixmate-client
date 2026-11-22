@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
+import { BookingStatusDonut, CategoryBars, categorySlices, statusSlices } from "@/components/charts/overview-charts";
 import { buttonVariants } from "@/components/ui/button";
 import { staggerParent } from "@/lib/motion/variants";
 import { formatMoney, type Booking } from "@/lib/types";
@@ -56,6 +57,16 @@ export function TechnicianOverview({ bookings }: { bookings: Booking[] }) {
       ? [newestRequest, ...recent]
       : recent;
 
+  const earningSlices = categorySlices(
+    items
+      .filter((item) => item.status === "completed" && item.paymentStatus === "paid")
+      .map((item) => ({ category: item.category, amount: item.finalAmount ?? item.basePrice }))
+  );
+  const requestSlices = categorySlices(
+    items.map((item) => ({ category: item.category, amount: 1 }))
+  );
+  const hasEarnings = earningSlices.length > 0;
+
   return (
     <div className="space-y-8">
       <motion.div
@@ -93,6 +104,31 @@ export function TechnicianOverview({ bookings }: { bookings: Booking[] }) {
           tone="bg-status-paid/12 text-status-paid"
         />
       </motion.div>
+
+      {items.length > 0 ? (
+        <motion.div
+          variants={staggerParent()}
+          initial="hidden"
+          animate="show"
+          className="grid gap-5 lg:grid-cols-2"
+        >
+          <BookingStatusDonut
+            slices={statusSlices(items)}
+            title="Request pipeline"
+            description="Every job that has reached your queue and where it sits now."
+          />
+          <CategoryBars
+            slices={hasEarnings ? earningSlices : requestSlices}
+            title={hasEarnings ? "Earnings by category" : "Jobs by category"}
+            description={
+              hasEarnings
+                ? "What each kind of repair has actually paid you."
+                : "Where your requests are coming from, before the first job is paid."
+            }
+            currency={hasEarnings}
+          />
+        </motion.div>
+      ) : null}
 
       <section>
         <div className="flex flex-wrap items-center justify-between gap-3">

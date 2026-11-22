@@ -59,6 +59,10 @@ function TechnicianOverviewSkeleton() {
           <Skeleton key={index} className="h-20 w-full rounded-xl" />
         ))}
       </div>
+      <div className="grid gap-5 lg:grid-cols-2">
+        <Skeleton className="h-[292px] w-full rounded-xl" />
+        <Skeleton className="h-[292px] w-full rounded-xl" />
+      </div>
       <BookingsGridSkeleton count={3} />
       <div className="grid gap-4 sm:grid-cols-2">
         <Skeleton className="h-20 w-full rounded-xl" />

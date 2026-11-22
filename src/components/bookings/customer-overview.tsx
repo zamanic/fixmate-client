@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { CalendarClock, CircleCheck, ClipboardList, Wrench, Wallet } from "lucide-react";
 
+import { BookingStatusDonut, CategoryBars, categorySlices, statusSlices } from "@/components/charts/overview-charts";
 import { EmptyState } from "@/components/empty-state";
 import { buttonVariants } from "@/components/ui/button";
 import { staggerParent } from "@/lib/motion/variants";
@@ -84,6 +85,29 @@ export function CustomerOverview({ bookings }: { bookings: Booking[] }) {
           tone="bg-status-paid/12 text-status-paid"
         />
       </motion.div>
+
+      {items.length > 0 ? (
+        <motion.div
+          variants={staggerParent()}
+          initial="hidden"
+          animate="show"
+          className="grid gap-5 lg:grid-cols-2"
+        >
+          <BookingStatusDonut
+            slices={statusSlices(items)}
+            title="Where your requests stand"
+            description="The live status mix across every repair you've asked for."
+          />
+          <CategoryBars
+            slices={categorySlices(
+              items.map((item) => ({ category: item.category, amount: item.finalAmount ?? item.basePrice }))
+            )}
+            title="Spend by category"
+            description="Final amounts where a job is closed, agreed estimates where it isn't."
+            currency
+          />
+        </motion.div>
+      ) : null}
 
       {items.length === 0 ? (
         <EmptyState
