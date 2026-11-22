@@ -55,11 +55,25 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="fm-glass-header sticky top-0 z-40 border-b">
-      <div className="fm-shell flex h-16 items-center gap-4">
+    <header
+      className="fm-glass-header sticky top-0 z-40 border-b"
+      style={{
+        // LightningCSS collapses this to the WebKit prefix in the emitted CSS.
+        // Keep the standard property inline so unprefixed browsers still blur.
+        backdropFilter: "blur(18px) saturate(140%)",
+        WebkitBackdropFilter: "blur(18px) saturate(140%)",
+      }}
+    >
+      {/*
+        Three columns on desktop (`1fr auto 1fr`): the logo and the actions take
+        the equal outer tracks, so the nav in the middle track lands on the true
+        centre of the header however wide either side grows. Below `lg` the nav
+        is hidden and the two-track grid keeps logo left / actions right.
+      */}
+      <div className="fm-shell grid h-16 grid-cols-[1fr_auto] items-center gap-4 lg:grid-cols-[1fr_auto_1fr]">
         <Logo />
 
-        <nav aria-label="Main" className="ml-2 hidden items-center gap-1 lg:flex">
+        <nav aria-label="Main" className="hidden items-center justify-center gap-1 lg:flex">
           {PUBLIC_NAV.map((item) => {
             const active = isActivePath(pathname, item.href);
             return (
@@ -85,7 +99,7 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="flex items-center justify-end gap-1.5">
           <ThemeToggle className="hidden sm:inline-flex" />
 
           {isPending ? (
