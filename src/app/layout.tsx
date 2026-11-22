@@ -31,8 +31,8 @@ const mono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "FixMate — Book a trusted technician, on demand",
-    template: "%s · FixMate",
+    default: "FixMate | Book a trusted technician",
+    template: "%s | FixMate",
   },
   description:
     "FixMate connects you with verified technicians for smartphones, laptops, appliances and home electrical work. Transparent hourly rates, live job tracking and pay only when the job is done.",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     "FixMate",
   ],
   openGraph: {
-    title: "FixMate — Book a trusted technician, on demand",
+    title: "FixMate | Book a trusted technician",
     description:
       "Verified technicians for phones, laptops, appliances and electrical work. Track the job live and pay only after completion.",
     type: "website",
@@ -96,10 +96,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
  */
 function HeaderFallback() {
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
-      <div className="fm-shell flex h-16 items-center gap-4">
+    <header className="fm-glass-header sticky top-0 z-40 border-b">
+      <div className="fm-shell grid h-16 grid-cols-[1fr_auto] items-center gap-4 lg:grid-cols-[1fr_auto_1fr]">
         <div className="h-7 w-28 rounded-md bg-muted" />
-        <div className="ml-auto flex items-center gap-2">
+        <div className="hidden items-center gap-3 lg:flex">
+          <div className="h-5 w-14 rounded-md bg-muted" />
+          <div className="h-5 w-24 rounded-md bg-muted" />
+          <div className="h-5 w-20 rounded-md bg-muted" />
+          <div className="h-5 w-16 rounded-md bg-muted" />
+        </div>
+        <div className="flex items-center justify-end gap-2">
           <div className="size-8 rounded-full bg-muted" />
           <div className="hidden h-9 w-20 rounded-lg bg-muted sm:block" />
         </div>

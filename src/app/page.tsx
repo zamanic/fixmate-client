@@ -16,7 +16,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Book a trusted technician, on demand",
+  /* Absolute: the landing page is the brand's front door, so its tab title is
+     the full strap line rather than "… | FixMate". */
+  title: { absolute: "FixMate | Book a trusted technician" },
   description:
     "FixMate connects you with verified technicians for smartphones, laptops, appliances and home electrical work. Send one request, track the job live, and pay only after it is fixed.",
 };
