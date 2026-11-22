@@ -9,6 +9,13 @@ import { Spinner } from "@/components/spinner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  IMAGE_ACCEPT,
+  REJECTION_MESSAGE,
+  UPLOAD_FAILED_MESSAGE,
+  imageRejection,
+  uploadToImgbb,
+} from "@/lib/imgbb";
 
 /**
  * The listing photo field.
@@ -18,11 +25,10 @@ import { Label } from "@/components/ui/label";
  * URL) so the box fills the moment something is picked. Pasting a direct URL
  * remains an equal fallback — both paths set the same value, so the form never
  * depends on which one was used.
+ *
+ * The upload plumbing itself (key, limits, ImgBB call, copy) lives in
+ * `@/lib/imgbb` so this picker and the profile photo field stay identical.
  */
-const IMGBB_KEY = (process.env.NEXT_PUBLIC_IMGBB_API_KEY ?? "").trim();
-const MAX_BYTES = 8 * 1024 * 1024;
-const ACCEPTED_TYPES = ["image/jpeg", "image/png"];
-
 export function ImageField({
   value,
   onChange,
@@ -56,18 +62,10 @@ export function ImageField({
   async function handleFile(file: File | undefined) {
     if (!file) return;
 
-    if (!ACCEPTED_TYPES.includes(file.type)) {
-      toast.error("Choose a JPG or PNG image.");
-      return;
-    }
-    if (file.size > MAX_BYTES) {
-      toast.error("That image is larger than 8 MB. Please pick a smaller one.");
-      return;
-    }
-    if (!IMGBB_KEY) {
-      toast.error(
-        "Image uploads aren't configured yet. Paste a direct image URL instead."
-      );
+    const rejection = imageRejection(file);
+    if (rejection) {
+      toast.error(REJECTION_MESSAGE[rejection]);
+      if (fileRef.current) fileRef.current.value = "";
       return;
     }
 
@@ -78,19 +76,10 @@ export function ImageField({
 
     setUploading(true);
     try {
-      const body = new FormData();
-      body.append("image", file);
-      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
-        method: "POST",
-        body,
-      });
-      const json = (await res.json().catch(() => null)) as { data?: { url?: string } } | null;
-      const url = json?.data?.url;
-      if (!res.ok || !url) throw new Error("upload failed");
-      onChange(url);
+      onChange(await uploadToImgbb(file));
       toast.success("Image uploaded to ImgBB.");
     } catch {
-      toast.error("The image upload didn't go through. Please try again or paste a URL.");
+      toast.error(UPLOAD_FAILED_MESSAGE);
     } finally {
       setUploading(false);
       clearPreview();
@@ -126,7 +115,7 @@ export function ImageField({
             <input
               ref={fileRef}
               type="file"
-              accept="image/jpeg,image/png"
+              accept={IMAGE_ACCEPT}
               className="hidden"
               onChange={(event) => void handleFile(event.target.files?.[0])}
             />
@@ -141,7 +130,7 @@ export function ImageField({
               {uploading ? "Uploading…" : "Upload image"}
             </Button>
             <p className="mt-1.5 text-xs text-muted-foreground">
-              Uploaded through ImgBB. JPG or PNG, up to 8 MB.
+              Uploaded through the ImgBB step. JPG or PNG, up to 8 MB.
             </p>
           </div>
 

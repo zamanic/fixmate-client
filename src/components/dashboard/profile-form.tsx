@@ -3,11 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, useAnimationControls } from "framer-motion";
-import { BadgeCheck, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { toast } from "sonner";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { AvatarField } from "@/components/dashboard/avatar-field";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,9 +20,11 @@ import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { ApiError, apiPatch } from "@/lib/api";
+import { refreshClientSession } from "@/lib/auth-client";
 import { fadeUp, shake } from "@/lib/motion/variants";
-import { ROLE_LABEL, initials, type AppUser } from "@/lib/types";
+import { ROLE_LABEL, type AppUser } from "@/lib/types";
 
+// Mirrors MAX_LENGTHS in the server's PATCH /api/users/profile — keep in sync.
 const MAX = { name: 80, phone: 30, area: 80, bio: 280, image: 500 };
 
 export function ProfileForm({ user }: { user: AppUser }) {
@@ -55,6 +56,10 @@ export function ProfileForm({ user }: { user: AppUser }) {
     setSaving(true);
     try {
       await apiPatch("/api/users/profile", { ...form, name: form.name.trim() }, true);
+      // The API wrote Mongo directly, so the cached session still holds the old
+      // name/photo — refresh it before re-rendering so the navbar and the
+      // dashboard identity card update without a re-login.
+      await refreshClientSession();
       toast.success("Profile saved.");
       router.refresh();
     } catch (error) {
@@ -66,33 +71,24 @@ export function ProfileForm({ user }: { user: AppUser }) {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+    <motion.div initial="hidden" animate="show" variants={fadeUp}>
       <form onSubmit={onSubmit} noValidate>
         <motion.div animate={controls} variants={shake}>
           <Card>
             <CardHeader>
               <CardTitle>Profile details</CardTitle>
               <CardDescription>
-                Technicians with a complete profile are booked 3× more often. Your email and
-                role are fixed by FixMate.
+                Keep your details current so customers can reach you. Your email and role are
+                fixed by FixMate.
               </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Avatar size="lg">
-                  {form.image ? <AvatarImage src={form.image} alt="" /> : null}
-                  <AvatarFallback>{initials(form.name)}</AvatarFallback>
-                </Avatar>
-                <div className="min-w-0">
-                  <p className="truncate font-medium text-ink">{form.name || "Your name"}</p>
-                  <p className="truncate text-sm text-muted-foreground">{user.email}</p>
-                  <Badge className="mt-1 bg-signal/12 text-signal">
-                    <BadgeCheck className="size-3" />
-                    {ROLE_LABEL[user.role]}
-                  </Badge>
-                </div>
-              </div>
+              <AvatarField
+                value={form.image}
+                onChange={(value) => set("image", value)}
+                name={form.name}
+              />
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field
@@ -110,6 +106,20 @@ export function ProfileForm({ user }: { user: AppUser }) {
                   onChange={(v) => set("phone", v)}
                 />
                 <Field
+                  label="Email"
+                  value={user.email}
+                  max={MAX.name}
+                  onChange={() => {}}
+                  disabled
+                />
+                <Field
+                  label="Role"
+                  value={ROLE_LABEL[user.role]}
+                  max={MAX.name}
+                  onChange={() => {}}
+                  disabled
+                />
+                <Field
                   label="Service area"
                   value={form.area}
                   max={MAX.area}
@@ -117,20 +127,12 @@ export function ProfileForm({ user }: { user: AppUser }) {
                   onChange={(v) => set("area", v)}
                   className="sm:col-span-2"
                 />
-                <Field
-                  label="Avatar image URL"
-                  value={form.image}
-                  max={MAX.image}
-                  placeholder="https://…"
-                  onChange={(v) => set("image", v)}
-                  className="sm:col-span-2"
-                />
               </div>
 
               <div className="grid gap-2">
-                <Label htmlFor="bio">Short bio</Label>
+                <Label htmlFor="short-bio">Short bio</Label>
                 <Textarea
-                  id="bio"
+                  id="short-bio"
                   value={form.bio}
                   maxLength={MAX.bio}
                   rows={4}
@@ -163,6 +165,7 @@ function Field({
   max,
   placeholder,
   required,
+  disabled,
   className,
 }: {
   label: string;
@@ -171,6 +174,7 @@ function Field({
   max: number;
   placeholder?: string;
   required?: boolean;
+  disabled?: boolean;
   className?: string;
 }) {
   const id = label.toLowerCase().replace(/\s+/g, "-");
@@ -182,6 +186,9 @@ function Field({
         value={value}
         maxLength={max}
         placeholder={placeholder}
+        disabled={disabled}
+        readOnly={disabled}
+        aria-readonly={disabled || undefined}
         onChange={(e) => onChange(e.target.value)}
         aria-required={required}
       />

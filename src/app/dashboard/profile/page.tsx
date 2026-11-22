@@ -22,7 +22,7 @@ export default async function ProfilePage() {
       <DashboardHeading
         eyebrow="Account"
         title="Update profile"
-        description="Your name and service area appear on every service you list and on receipts."
+        description="Your name and photo show in the navbar and on your services."
       />
       <div className="max-w-3xl">
         <ProfileForm user={user} />
