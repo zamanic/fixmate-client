@@ -4,8 +4,8 @@
 
 This repository is the **client** (Next.js 16, App Router, TypeScript). The Express API lives in the companion repo **fixmate-server**.
 
-- **Live URL:** _pending deployment — see “Deployment” below._
-- **API base URL:** `http://localhost:8000` (via `NEXT_PUBLIC_API_URL`)
+- **Live URL:** https://fix-mate-client-kohl.vercel.app
+- **API base URL:** `https://fix-mate-server-delta.vercel.app` (via `NEXT_PUBLIC_API_URL`)
 
 ---
 
@@ -145,4 +145,15 @@ Sign in with each to see the matching dashboard. The seed also includes a second
 
 ## Deployment
 
-Not deployed yet. Planned target is **Vercel** for both apps, with `NEXT_PUBLIC_API_URL` pointed at the deployed API and `BETTER_AUTH_URL` / `BETTER_AUTH_TRUSTED_ORIGINS` set to the deployed client origin. The Stripe webhook must be registered against `POST <api>/api/payments/webhook` and its signing secret set as `STRIPE_WEBHOOK_SECRET`. The live URL will replace the placeholder at the top of this file once shipped.
+Both apps run on **Vercel**:
+
+| App | Production URL |
+|---|---|
+| Client | https://fix-mate-client-kohl.vercel.app (alias: `fix-mate-client-zamanics-projects.vercel.app`) |
+| API | https://fix-mate-server-delta.vercel.app |
+
+Client project environment: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_APP_URL`, `BETTER_AUTH_URL`, `BETTER_AUTH_TRUSTED_ORIGINS` (every client alias), `BETTER_AUTH_SECRET`, `BETTER_AUTH_DB_URL` (or `MONGODB_URI`), `DB_NAME`, `BETTER_AUTH_GOOGLE_CLIENT_ID` / `BETTER_AUTH_GOOGLE_SECRET`, `NEXT_PUBLIC_AUTH_GOOGLE_ENABLED`, `NEXT_PUBLIC_IMGBB_API_KEY`. `BETTER_AUTH_URL` must equal the API’s `CLIENT_URL` exactly — that pair is the JWT issuer/audience the server verifies, and the API fetches `/api/auth/jwks` from it.
+
+> Deployment Protection (**Vercel Authentication**) must stay **off** on both projects. With it on, every request — including `/api/auth/jwks` — 302s to `vercel.com/sso-api`, so the site is unreachable and the API can never fetch the signing keys.
+
+The Stripe webhook must be registered against `POST <api>/api/payments/webhook` with its signing secret set as `STRIPE_WEBHOOK_SECRET`; until then the success page confirms payment through `GET /api/payments/verify` instead.
