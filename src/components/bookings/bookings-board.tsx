@@ -146,10 +146,7 @@ export function BookingsBoard({ bookings, role }: { bookings: Booking[]; role: R
             onReset={() => setFilter("all")}
           />
         ) : (
-          <motion.div
-            layout
-            className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3"
-          >
+          <motion.div layout className="grid grid-cols-1 gap-5">
             <AnimatePresence mode="popLayout" initial={false}>
               {visible.map((booking) => (
                 <motion.div

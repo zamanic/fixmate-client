@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import type { Role } from "@/lib/types";
+import { ticketCode, type Role } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 import { BookingRequestForm, type TicketReceipt } from "./booking-request-form";
@@ -122,7 +122,8 @@ function RequestSent({ receipt }: { receipt: TicketReceipt }) {
         </span>
         <DialogTitle className="text-lg">Request sent</DialogTitle>
         <DialogDescription>
-          Ticket <span className="font-mono break-all text-ink">#{receipt.ticketId}</span> is with{" "}
+          Ticket{" "}
+          <span className="font-mono text-ink">#{ticketCode(receipt.ticketId)}</span> is with{" "}
           <span className="font-medium text-ink">{receipt.technicianName}</span>. You will see it
           move to accepted once they review it.
         </DialogDescription>

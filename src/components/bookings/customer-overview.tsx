@@ -129,7 +129,7 @@ export function CustomerOverview({ bookings }: { bookings: Booking[] }) {
             </Link>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-4 grid grid-cols-1 gap-5">
             {shown.map((booking) => (
               <BookingCard
                 key={booking._id}

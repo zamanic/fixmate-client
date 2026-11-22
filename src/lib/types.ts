@@ -230,6 +230,16 @@ export function formatDateTime(value: string | Date | null | undefined): string 
   });
 }
 
+/**
+ * The human-readable ticket code shown on a booking (`#FM-1047`). API ids are
+ * Mongo ObjectIds, whose trailing counter is the only short, stable part, so
+ * the code is derived from it rather than inventing a second identifier.
+ */
+export function ticketCode(id: string | null | undefined): string {
+  const tail = (id ?? "").replace(/[^a-z0-9]/gi, "").slice(-4).toUpperCase();
+  return `FM-${tail.padStart(4, "0")}`;
+}
+
 /** Initials used by avatar fallbacks. */
 export function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
