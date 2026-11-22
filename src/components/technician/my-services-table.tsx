@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { EmptyState } from "@/components/empty-state";
+import { normalizeService, normalizeServices } from "@/components/services/normalize";
 import { ServiceImage } from "@/components/services/service-image";
 import { Spinner } from "@/components/spinner";
 import { ApprovalStatusBadge } from "@/components/status-badge";
@@ -68,7 +69,7 @@ export function MyServicesTable() {
   const load = useCallback(async () => {
     try {
       const data = await fetchMine();
-      setItems(data.items ?? []);
+      setItems(normalizeServices(data.items ?? []));
       setFailed(false);
     } catch (error) {
       setFailed(true);
@@ -84,7 +85,7 @@ export function MyServicesTable() {
     fetchMine()
       .then((data) => {
         if (cancelled) return;
-        setItems(data.items ?? []);
+        setItems(normalizeServices(data.items ?? []));
         setFailed(false);
       })
       .catch((error) => {
@@ -118,7 +119,9 @@ export function MyServicesTable() {
       );
       if (result?.service) {
         setItems((prev) =>
-          prev?.map((item) => (item._id === service._id ? result.service : item)) ?? prev
+          prev?.map((item) =>
+            item._id === service._id ? normalizeService(result.service) : item
+          ) ?? prev
         );
       }
       toast.success(

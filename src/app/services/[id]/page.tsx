@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
+import { normalizeService } from "@/components/services/normalize";
 import { RequestRepairButton } from "@/components/services/request-repair-button";
 import { ServiceImage } from "@/components/services/service-image";
 import { readRating } from "@/components/services/service-query";
@@ -46,7 +47,7 @@ const loadService = cache(async (id: string): Promise<ServiceResult> => {
     if (!res.ok) return { ok: false, notFound: false };
     const data = (await res.json()) as { service?: Service };
     if (!data?.service) return { ok: false, notFound: true };
-    return { ok: true, service: data.service };
+    return { ok: true, service: normalizeService(data.service) };
   } catch {
     return { ok: false, notFound: false };
   }

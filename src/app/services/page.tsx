@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { SearchX, Wrench } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
+import { normalizeServices } from "@/components/services/normalize";
 import { ServiceFilters } from "@/components/services/service-filters";
 import { ServiceGridSkeleton } from "@/components/services/service-grid-skeleton";
 import { ServicePagination } from "@/components/services/service-pagination";
@@ -71,6 +72,8 @@ async function ServicesExplorer({ searchParams }: ServicesPageProps) {
     );
   }
 
+  const items = normalizeServices(data.items);
+
   return (
     <>
       <div className="mt-10">
@@ -78,7 +81,7 @@ async function ServicesExplorer({ searchParams }: ServicesPageProps) {
       </div>
 
       <div className="mt-8">
-        {data.items.length === 0 ? (
+        {items.length === 0 ? (
           <EmptyState
             icon={SearchX}
             title="No services match your filters"
@@ -88,7 +91,7 @@ async function ServicesExplorer({ searchParams }: ServicesPageProps) {
           />
         ) : (
           <>
-            <ServicesGrid items={data.items} />
+            <ServicesGrid items={items} />
             <ServicePagination
               page={data.page}
               pages={data.pages}

@@ -1,6 +1,7 @@
 import { Wrench } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
+import { normalizeServices } from "@/components/services/normalize";
 import { ServiceGridSkeleton } from "@/components/services/service-grid-skeleton";
 import { ServicesGrid } from "@/components/services/services-grid";
 import { serverFetch } from "@/lib/server-api";
@@ -15,7 +16,7 @@ import type { Service } from "@/lib/types";
  */
 export async function FeaturedServices() {
   const data = await serverFetch<{ items: Service[] }>("/api/services/featured?limit=6");
-  const items = data?.items ?? [];
+  const items = normalizeServices(data?.items ?? []);
 
   if (items.length === 0) {
     return (
