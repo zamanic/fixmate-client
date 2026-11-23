@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 
 import { BookingActions } from "./booking-actions";
 import { BookingCard } from "./booking-card";
+import { bookingAmount, bookingCategory, byNewestFirst } from "./normalize";
 import { StatCard } from "./stat-card";
 
 const ACTIVE_STATUSES: Booking["status"][] = ["requested", "accepted", "in-progress"];
@@ -37,11 +38,9 @@ export function CustomerOverview({ bookings }: { bookings: Booking[] }) {
   const completed = items.filter((item) => item.status === "completed").length;
   const paid = items
     .filter((item) => item.paymentStatus === "paid")
-    .reduce((sum, item) => sum + (item.finalAmount ?? 0), 0);
+    .reduce((sum, item) => sum + bookingAmount(item), 0);
 
-  const sorted = [...items].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  const sorted = [...items].sort(byNewestFirst);
   const recent = sorted.slice(0, 3);
   const newestActive = sorted.find((item) => ACTIVE_STATUSES.includes(item.status));
   const shown =
@@ -100,7 +99,7 @@ export function CustomerOverview({ bookings }: { bookings: Booking[] }) {
           />
           <CategoryBars
             slices={categorySlices(
-              items.map((item) => ({ category: item.category, amount: item.finalAmount ?? item.basePrice }))
+              items.map((item) => ({ category: bookingCategory(item), amount: bookingAmount(item) }))
             )}
             title="Spend by category"
             description="Final amounts where a job is closed, agreed estimates where it isn't."

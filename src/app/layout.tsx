@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { Geist_Mono, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 
+import { RouteProgress } from "@/components/route-progress";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Toaster } from "@/components/ui/sonner";
@@ -75,6 +76,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           disableTransitionOnChange
         >
           <TooltipProvider delay={150}>
+            {/*
+              The top progress bar reads the URL (`useSearchParams`), which is a
+              request-time value in the static shell — keep it behind a boundary
+              so the root layout still prerenders.
+            */}
+            <Suspense fallback={null}>
+              <RouteProgress />
+            </Suspense>
             <div className="flex min-h-dvh flex-col">
               <Suspense fallback={<HeaderFallback />}>
                 <SiteHeader />

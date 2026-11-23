@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/spinner";
 import { SERVICE_CATEGORIES, SERVICE_MODES } from "@/lib/types";
 
 import {
@@ -23,6 +24,7 @@ import {
   servicesHref,
   type ServiceQuery,
 } from "./service-query";
+import { useResultsPending } from "./results-pending";
 
 /**
  * The Explore Services filter bar. The URL is the single source of truth: this
@@ -38,9 +40,17 @@ export function ServiceFilters({ total }: { total: number | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const query = parseServiceQuery(Object.fromEntries(searchParams.entries()));
-  // Keeps the results swap a transition so the grid streams in without a
-  // skeleton flash and the inputs below never lose focus mid-typing.
+  // Keeps the results swap a transition: the inputs below never unmount, so
+  // typing keeps focus, while the grid below swaps to skeletons meanwhile.
   const [isPending, startTransition] = useTransition();
+  // Mirror the router transition into the shared flag the results grid reads,
+  // so a filter change swaps the grid for skeletons while this card keeps its
+  // inputs mounted (typing is never interrupted).
+  const { setPending } = useResultsPending();
+
+  useEffect(() => {
+    setPending(isPending);
+  }, [isPending, setPending]);
 
   const [search, setSearch] = useState(query.search);
   const [area, setArea] = useState(query.area);
@@ -270,12 +280,16 @@ export function ServiceFilters({ total }: { total: number | null }) {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
-        <p className="text-sm text-muted-foreground" aria-live="polite">
-          {isPending
-            ? "Updating results…"
-            : total === null
-              ? "Loading results…"
-              : `${total} service${total === 1 ? "" : "s"} found`}
+        <p className="flex items-center gap-2 text-sm text-muted-foreground" aria-live="polite">
+          {isPending ? (
+            <>
+              <Spinner className="size-3.5" /> Updating results…
+            </>
+          ) : total === null ? (
+            "Loading results…"
+          ) : (
+            `${total} service${total === 1 ? "" : "s"} found`
+          )}
         </p>
         {hasActiveFilters(query) ? (
           <Button type="button" variant="ghost" size="sm" onClick={clearAll}>

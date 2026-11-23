@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { SearchX, Wrench } from "lucide-react";
+import { Wrench } from "lucide-react";
 
 import { EmptyState } from "@/components/empty-state";
 import { normalizeServices } from "@/components/services/normalize";
+import { ResultsPendingProvider } from "@/components/services/results-pending";
 import { ServiceFilters } from "@/components/services/service-filters";
 import { ServiceGridSkeleton } from "@/components/services/service-grid-skeleton";
-import { ServicePagination } from "@/components/services/service-pagination";
 import {
   parseServiceQuery,
   serviceApiPath,
   type RawSearchParams,
 } from "@/components/services/service-query";
-import { ServicesGrid } from "@/components/services/services-grid";
+import { ServicesResults } from "@/components/services/services-results";
 import { Skeleton } from "@/components/ui/skeleton";
 import { serverFetch } from "@/lib/server-api";
 import type { Paginated, Service } from "@/lib/types";
@@ -75,33 +75,20 @@ async function ServicesExplorer({ searchParams }: ServicesPageProps) {
   const items = normalizeServices(data.items);
 
   return (
-    <>
+    <ResultsPendingProvider>
       <div className="mt-10">
         <ServiceFilters total={data.total} />
       </div>
 
       <div className="mt-8">
-        {items.length === 0 ? (
-          <EmptyState
-            icon={SearchX}
-            title="No services match your filters"
-            description="Try a different category, widen the price range or clear your filters to see every available technician."
-            actionLabel="Clear filters"
-            actionHref="/services"
-          />
-        ) : (
-          <>
-            <ServicesGrid items={items} query={query} />
-            <ServicePagination
-              page={data.page}
-              pages={data.pages}
-              query={query}
-              className="mt-10"
-            />
-          </>
-        )}
+        <ServicesResults
+          items={items}
+          query={query}
+          page={data.page}
+          pages={data.pages}
+        />
       </div>
-    </>
+    </ResultsPendingProvider>
   );
 }
 

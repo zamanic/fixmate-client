@@ -29,7 +29,7 @@ export const SEEDED_SERVICE_IMAGE_OVERRIDES: Record<string, string> = {
 };
 
 /** True for the old generated-image URL shape written by seed.js. */
-function isSeededDynamicImage(src: string): boolean {
+export function isGeneratedImage(src: string): boolean {
   return (
     !src ||
     src.includes("coresg-normal.trae.ai") ||
@@ -41,6 +41,6 @@ function isSeededDynamicImage(src: string): boolean {
 /** Resolve a listing to a stable local image when it still uses a seed URL. */
 export function serviceImageFor(title: string, src: string): string {
   const local = SEEDED_SERVICE_IMAGE_OVERRIDES[title];
-  if (!local || !isSeededDynamicImage(src)) return src;
+  if (!local || !isGeneratedImage(src)) return src;
   return local;
 }

@@ -47,9 +47,10 @@ export function BookingCard({
 }) {
   const [expanded, setExpanded] = useState(false);
 
-  const tint = CATEGORY_TINT[booking.category];
+  const tint = CATEGORY_TINT[booking.category] ?? "";
   const counterpartyLabel = role === "customer" ? "Technician" : "Customer";
-  const counterpartyName = role === "customer" ? booking.technicianName : booking.customerName;
+  const counterpartyName =
+    (role === "customer" ? booking.technicianName : booking.customerName) ?? "";
 
   const description = booking.problemDescription ?? "";
   const truncated = description.length > DESCRIPTION_LIMIT;
@@ -76,8 +77,8 @@ export function BookingCard({
           )}
         >
           <ServiceImage
-            src={CATEGORY_TILE_IMAGE[booking.category]}
-            alt={`${booking.category} repair`}
+            src={CATEGORY_TILE_IMAGE[booking.category] ?? ""}
+            alt={`${booking.category ?? "Repair"} repair`}
           />
         </div>
 

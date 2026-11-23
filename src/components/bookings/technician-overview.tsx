@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 
 import { BookingActions } from "./booking-actions";
 import { BookingCard } from "./booking-card";
+import { bookingAmount, bookingCategory, byNewestFirst } from "./normalize";
 import { StatCard } from "./stat-card";
 
 /** Technician overview: listing + request totals, the newest requests, and quick links. */
@@ -49,11 +50,9 @@ export function TechnicianOverview({
   const pendingRequests = items.filter((item) => item.status === "requested").length;
   const earnings = items
     .filter((item) => item.status === "completed" && item.paymentStatus === "paid")
-    .reduce((sum, item) => sum + (item.finalAmount ?? 0), 0);
+    .reduce((sum, item) => sum + bookingAmount(item), 0);
 
-  const sorted = [...items].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  );
+  const sorted = [...items].sort(byNewestFirst);
   const recent = sorted.slice(0, 3);
   const newestRequest = sorted.find((item) => item.status === "requested");
   const shown =
@@ -64,10 +63,10 @@ export function TechnicianOverview({
   const earningSlices = categorySlices(
     items
       .filter((item) => item.status === "completed" && item.paymentStatus === "paid")
-      .map((item) => ({ category: item.category, amount: item.finalAmount ?? item.basePrice }))
+      .map((item) => ({ category: bookingCategory(item), amount: bookingAmount(item) }))
   );
   const requestSlices = categorySlices(
-    items.map((item) => ({ category: item.category, amount: 1 }))
+    items.map((item) => ({ category: bookingCategory(item), amount: 1 }))
   );
   const hasEarnings = earningSlices.length > 0;
 

@@ -295,6 +295,67 @@
     transform: translateY(-4px);
     box-shadow: 0 18px 40px -24px color-mix(in oklab, var(--ink) 45%, transparent);
   }
+
+  /* Loading shimmer. One brand-tinted sweep is shared by every skeleton in the
+     app so all placeholder states read as a single system: a flat `--muted`
+     base with a light sheen (plus a whisper of the brand orange) drifting
+     left-to-right. The base colour stays visible if the animation is stopped,
+     so the reduced-motion guard at the end of this file degrades gracefully to
+     a calm static block. */
+  .fm-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .fm-shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      color-mix(in oklab, var(--card) 62%, transparent) 42%,
+      color-mix(in oklab, var(--signal) 14%, transparent) 56%,
+      transparent 100%
+    );
+    animation: fm-shimmer 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+
+  /* Progressive image fade — a loaded bitmap eases in over its shimmer. */
+  .fm-img-fade {
+    transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Route progress — a hairline brand bar pinned to the very top edge that
+     confirms a navigation the moment a link is clicked, so a route change
+     never reads as a dead click. Every colour rides the tokens, so light and
+     dark look identical, and the reduced-motion guard at the end of this file
+     flattens both transitions to an instant set/reset. */
+  .fm-progress {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    height: 2px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .fm-progress[data-active="true"] {
+    opacity: 1;
+  }
+  .fm-progress-bar {
+    height: 100%;
+    border-radius: 0 999px 999px 0;
+    background: var(--signal);
+    box-shadow: 0 0 12px color-mix(in oklab, var(--signal) 55%, transparent);
+    transition: width 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@keyframes fm-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 /* Glassy sticky nav. The tint rides the theme-stable `--nav-surface` (dark
@@ -380,5 +441,9 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  /* …and the loading shimmer settles into its flat base colour entirely. */
+  .fm-shimmer::after {
+    animation: none;
   }
 }

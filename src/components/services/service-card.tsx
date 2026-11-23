@@ -6,6 +6,7 @@ import { Clock, MapPin, Star } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
+import { CATEGORY_TILE_IMAGE } from "@/lib/images";
 import { gridItem } from "@/lib/motion/variants";
 import { CATEGORY_TINT, formatMoney, type Service } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -30,7 +31,11 @@ export function ServiceCard({ service, query }: { service: Service; query?: Serv
     <motion.div variants={gridItem} className="h-full">
       <div className="fm-card-hover flex h-full flex-col overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
         <div className={cn("relative aspect-[16/10] w-full overflow-hidden", tint)}>
-          <ServiceImage src={service.image} alt={service.title} />
+          <ServiceImage
+            src={service.image}
+            alt={service.title}
+            fallbackSrc={CATEGORY_TILE_IMAGE[service.category]}
+          />
           <Badge className={cn("absolute top-3 left-3 rounded-full border-0 text-ink", tint)}>
             {service.category}
           </Badge>

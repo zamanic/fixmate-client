@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 
 import { BookingActions } from "./booking-actions";
 import { BookingCard } from "./booking-card";
+import { byNewestFirst } from "./normalize";
 
 /**
  * The bookings board shared by "My bookings" (customer) and "Job requests"
@@ -51,13 +52,7 @@ export function BookingsBoard({ bookings, role }: { bookings: Booking[]; role: R
     setItems((prev) => prev.map((item) => (item._id === updated._id ? updated : item)));
   }, []);
 
-  const sorted = useMemo(
-    () =>
-      [...items].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      ),
-    [items]
-  );
+  const sorted = useMemo(() => [...items].sort(byNewestFirst), [items]);
 
   const counts = useMemo(() => {
     const map: Record<Filter, number> = {
@@ -69,7 +64,11 @@ export function BookingsBoard({ bookings, role }: { bookings: Booking[]; role: R
       rejected: 0,
       cancelled: 0,
     };
-    for (const item of items) map[item.status] += 1;
+    // A row with a status this build doesn't know about counts toward the
+    // total only — it must never create a phantom filter key or a NaN count.
+    for (const item of items) {
+      if (item.status in map) map[item.status] += 1;
+    }
     return map;
   }, [items]);
 

@@ -15,6 +15,7 @@ import {
 import { EmptyState } from "@/components/empty-state";
 import { normalizeService } from "@/components/services/normalize";
 import { RequestRepairButton } from "@/components/services/request-repair-button";
+import { ServiceDetailSkeleton } from "@/components/services/service-detail-skeleton";
 import { ServiceImage } from "@/components/services/service-image";
 import {
   parseServiceFrom,
@@ -24,8 +25,8 @@ import {
 } from "@/components/services/service-query";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { getCurrentUser } from "@/lib/auth-server";
+import { CATEGORY_TILE_IMAGE } from "@/lib/images";
 import { API_URL } from "@/lib/server-api";
 import { CATEGORY_TINT, formatMoney, initials, type Service } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -74,7 +75,7 @@ export async function generateMetadata({
 export default function ServiceDetailPage({ params, searchParams }: ServiceDetailPageProps) {
   return (
     <div className="fm-shell fm-section">
-      <Suspense fallback={<DetailSkeleton />}>
+      <Suspense fallback={<ServiceDetailSkeleton />}>
         <ServiceDetail params={params} searchParams={searchParams} />
       </Suspense>
     </div>
@@ -130,7 +131,12 @@ async function ServiceDetail({ params, searchParams }: ServiceDetailPageProps) {
               tint
             )}
           >
-            <ServiceImage src={service.image} alt={service.title} priority />
+            <ServiceImage
+              src={service.image}
+              alt={service.title}
+              priority
+              fallbackSrc={CATEGORY_TILE_IMAGE[service.category]}
+            />
             <Badge className={cn("absolute top-4 left-4 rounded-full border-0 text-ink", tint)}>
               {service.category}
             </Badge>
@@ -298,22 +304,6 @@ function SummaryRow({
         {label}
       </dt>
       <dd className="text-right font-medium text-ink">{value}</dd>
-    </div>
-  );
-}
-
-function DetailSkeleton() {
-  return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
-      <div className="space-y-6">
-        <Skeleton className="aspect-[16/9] w-full rounded-2xl" />
-        <Skeleton className="h-6 w-44" />
-        <Skeleton className="h-10 w-3/4" />
-        <Skeleton className="h-28 w-full rounded-xl" />
-        <Skeleton className="h-16 w-full" />
-        <Skeleton className="h-48 w-full rounded-xl" />
-      </div>
-      <Skeleton className="h-96 w-full rounded-2xl" />
     </div>
   );
 }
