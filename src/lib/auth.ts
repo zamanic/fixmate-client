@@ -24,10 +24,53 @@ if (!uri) {
 
 /** One pooled client per process — hot reloads would otherwise leak sockets. */
 const globalForMongo = globalThis as unknown as { __fixmateMongo?: MongoClient };
-const client = globalForMongo.__fixmateMongo ?? new MongoClient(uri, { appName: "FixMate" });
+const client =
+  globalForMongo.__fixmateMongo ??
+  new MongoClient(uri, {
+    appName: "FixMate",
+    // Serverless defaults. Bound the connect so an unreachable cluster fails in
+    // seconds instead of stalling a render for the 30s driver default, and keep
+    // the pool small because every Vercel instance keeps its own connections.
+    serverSelectionTimeoutMS: 10_000,
+    connectTimeoutMS: 10_000,
+    socketTimeoutMS: 45_000,
+    maxPoolSize: 5,
+    minPoolSize: 0,
+  });
 globalForMongo.__fixmateMongo = client;
 
 const db = client.db(DB_NAME);
+
+/**
+ * Make the pooled client usable again after a connect that failed.
+ *
+ * A failed connect — Atlas briefly unreachable, a 10s server-selection timeout —
+ * leaves `client.topology` pointing at a topology that has been *closed*, and
+ * the driver then keeps using that field for every later operation without
+ * checking it: `mongodb/lib/operations/execute_operation.js` reads
+ *
+ *     client.topology == null ? await autoConnect(client) : client.topology
+ *
+ * so nothing ever reconnects. Every session read on such an instance rejects
+ * with `MongoTopologyClosedError: Topology is closed` for the life of the
+ * process, which is what carried `/sign-in` and `/dashboard` to the route error
+ * boundary (BetterAuth logs the same and adds "It is not retried until the
+ * application restarts").
+ *
+ * `connect()` returns immediately while a topology is open and builds a fresh
+ * one when it isn't — see `mongo_client.js#_connect` — so awaiting it before a
+ * session read heals the instance at no cost on the happy path. It never throws
+ * here: when Atlas is genuinely down the caller still needs to degrade
+ * gracefully, and the next request simply retries.
+ */
+export async function ensureMongoConnected(): Promise<boolean> {
+  try {
+    await client.connect();
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /** Only these two can be self-selected at sign-up — `admin` never can. */
 const SIGNUP_ROLES = ["customer", "technician"] as const;

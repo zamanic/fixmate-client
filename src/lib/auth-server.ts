@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { connection } from "next/server";
-import { auth } from "@/lib/auth";
+import { auth, ensureMongoConnected } from "@/lib/auth";
 
 /**
  * Server-side auth helpers for server components, route handlers and layouts.
@@ -11,19 +11,37 @@ import { auth } from "@/lib/auth";
  * with `Date.now()`. Under Cache Components those clock reads are rejected
  * during the prerender pass, so the session is explicitly deferred to request
  * time — the same intent as reading `headers()`, made visible to the compiler.
+ *
+ * They also heal the Mongo client and never throw. A session read is not
+ * allowed to take a route to `src/app/error.tsx`: with no readable session the
+ * page renders its signed-out state, which is the honest answer, and a private
+ * route sends the visitor to `/sign-in` — never to "Something interrupted that
+ * page."
  */
 
 /** The active session, or null. */
 export async function getServerSession() {
   await connection();
-  return auth.api.getSession({ headers: await headers() });
+  await ensureMongoConnected();
+  try {
+    return await auth.api.getSession({ headers: await headers() });
+  } catch (error) {
+    console.error("[FixMate] session read failed:", error);
+    return null;
+  }
 }
 
 /** A fresh JWT for the Express API, or null when signed out. */
 export async function getServerJwtToken(): Promise<string | null> {
   await connection();
-  const result = await auth.api.getToken({ headers: await headers() });
-  return result?.token ?? null;
+  await ensureMongoConnected();
+  try {
+    const result = await auth.api.getToken({ headers: await headers() });
+    return result?.token ?? null;
+  } catch (error) {
+    console.error("[FixMate] token read failed:", error);
+    return null;
+  }
 }
 
 /** The signed-in user with our additional fields typed in. */
